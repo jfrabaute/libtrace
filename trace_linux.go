@@ -62,10 +62,34 @@ func (t *tracerImpl) Run() (err error) {
 		if err = syscall.PtraceGetRegs(t.cmd.Process.Pid, &regsExit); err != nil {
 			return
 		}
-		t.callback(regsEntry, true)
+		t.callback(regsExit, true)
 	}
 
 	return
+}
+
+func wait_for_syscall(pid int) (exited bool, err error) {
+	var waitStatus syscall.WaitStatus
+	for {
+		// Entering a syscall
+		if err = syscall.PtraceSyscall(pid, 0); err != nil {
+			return
+		}
+
+		if _, err = syscall.Wait4(pid, &waitStatus, 0, nil); err != nil {
+			return
+		}
+
+		// Is it for us ?
+		if waitStatus.Stopped() && waitStatus.StopSignal()&0x80 == 0x80 {
+			return
+		}
+
+		if waitStatus.Exited() {
+			exited = true
+			return
+		}
+	}
 }
 
 var unknownSignature Signature = Signature{
@@ -74,7 +98,9 @@ var unknownSignature Signature = Signature{
 	Args: nil,
 }
 
-func (t *tracerImpl) callback_generic(id SyscallId, exit bool) {
+func (t *tracerImpl) callback_generic(regs syscall.PtraceRegs, exit bool) {
+
+	id := getSyscallId(regs)
 
 	trace := Trace{
 		Exit: exit,
@@ -84,6 +110,13 @@ func (t *tracerImpl) callback_generic(id SyscallId, exit bool) {
 	} else {
 		trace.Signature = &unknownSignature
 	}
+
+	if exit {
+		trace.Errno = getExitCode(regs)
+	}
+
+	// Populate args values
+	populateArgs(&trace, regs)
 
 	var l []TracerCb
 	if !exit {
@@ -129,26 +162,14 @@ func (t *tracerImpl) callback_generic(id SyscallId, exit bool) {
 	}
 }
 
-func wait_for_syscall(pid int) (exited bool, err error) {
-	var waitStatus syscall.WaitStatus
-	for {
-		// Entering a syscall
-		if err = syscall.PtraceSyscall(pid, 0); err != nil {
-			return
-		}
+func populateArgs(trace *Trace, regs syscall.PtraceRegs) {
+	if len(trace.Signature.Args) == 0 {
+		return
+	}
 
-		if _, err = syscall.Wait4(pid, &waitStatus, 0, nil); err != nil {
-			return
-		}
+	trace.Args = make([]interface{}, len(trace.Signature.Args))
 
-		// Is it for us ?
-		if waitStatus.Stopped() && waitStatus.StopSignal()&0x80 == 0x80 {
-			return
-		}
-
-		if waitStatus.Exited() {
-			exited = true
-			return
-		}
+	for i, _ := range trace.Signature.Args {
+		trace.Args[i] = getParam(regs, i)
 	}
 }

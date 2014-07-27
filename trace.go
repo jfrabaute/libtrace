@@ -48,7 +48,7 @@ type Tracer interface {
 type Trace struct {
 	*Signature
 	Args  []interface{} // Args passed in
-	Errno uint64        // Result
+	Errno ExitCode      // Result
 	Exit  bool          // false when entering the syscal, true when exiting
 }
 
