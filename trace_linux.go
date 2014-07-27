@@ -1,6 +1,9 @@
 package libtrace
 
 import (
+	"fmt"
+	"log"
+	"reflect"
 	"runtime"
 	"syscall"
 )
@@ -116,7 +119,7 @@ func (t *tracerImpl) callback_generic(regs syscall.PtraceRegs, exit bool) {
 	}
 
 	// Populate args values
-	populateArgs(&trace, regs)
+	t.populateArgs(&trace, regs)
 
 	var l []TracerCb
 	if !exit {
@@ -162,14 +165,40 @@ func (t *tracerImpl) callback_generic(regs syscall.PtraceRegs, exit bool) {
 	}
 }
 
-func populateArgs(trace *Trace, regs syscall.PtraceRegs) {
+func (t *tracerImpl) populateArgs(trace *Trace, regs syscall.PtraceRegs) {
 	if len(trace.Signature.Args) == 0 {
 		return
 	}
 
 	trace.Args = make([]interface{}, len(trace.Signature.Args))
 
-	for i, _ := range trace.Signature.Args {
-		trace.Args[i] = getParam(regs, i)
+	for i, arg := range trace.Signature.Args {
+		trace.Args[i] = t.getRep(arg.Type, getParam(regs, i))
+	}
+}
+
+func (t *tracerImpl) getRep(typ reflect.Type, value regParam) interface{} {
+	switch typ.Kind() {
+	case reflect.String:
+		out := []byte{0}
+		str := make([]byte, 0, 10)
+		i := 0
+		for {
+			count, err := syscall.PtracePeekData(t.cmd.Process.Pid, uintptr(value+regParam(i)), out)
+			if out[0] == 0 {
+				break
+			}
+			if err != nil {
+				log.Printf("Error while reading syscal arg: %s", err)
+			}
+			if count != 1 {
+				log.Printf("Error while reading syscall arg: count = %d (should be 1)", count)
+			}
+			str = append(str, out[0])
+			i++
+		}
+		return "\"" + string(str) + "\""
+	default:
+		return "NOTIMPL=" + fmt.Sprintf("%v", value)
 	}
 }

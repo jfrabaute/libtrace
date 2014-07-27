@@ -84,6 +84,12 @@ var syscalls = []*Signature{
 				p = true
 			}
 
+			// Special case for "char *"
+			if typ == "char" && p {
+				typ = "char *"
+				p = false
+			}
+
 			if strings.Index(typ, "struct ") == 0 || strings.Index(typ, "union ") == 0 {
 				t = "reflect.TypeOf(struct{}{})"
 			} else if t, ok = types.Types[typ]; !ok {
