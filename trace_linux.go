@@ -107,7 +107,7 @@ func (t *tracerImpl) callback_generic(id SyscallId, exit bool) {
 		}
 	}
 
-	var lc []chan *Trace
+	var lc []chan<- *Trace
 	if !exit {
 		lc = t.globalChannelsOnEnter
 	} else {
@@ -116,7 +116,7 @@ func (t *tracerImpl) callback_generic(id SyscallId, exit bool) {
 	for _, in := range lc {
 		in <- &trace
 	}
-	var mc map[string][]chan *Trace
+	var mc map[string][]chan<- *Trace
 	if !exit {
 		mc = t.channelsOnEnter
 	} else {

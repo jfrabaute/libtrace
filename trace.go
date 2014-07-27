@@ -24,23 +24,23 @@ type Tracer interface {
 	// Register a channel where the Trace info
 	// will be sent in the enter phase
 	// when the named syscalls will be executed
-	RegisterChannelOnEnter(in chan *Trace, fnNames ...string)
+	RegisterChannelOnEnter(out chan<- *Trace, fnNames ...string)
 	// Register a channel where the Trace info
 	// will be sent in the exit phase
 	// when the named syscalls will be executed
-	RegisterChannelOnExit(in chan *Trace, fnNames ...string)
+	RegisterChannelOnExit(out chan<- *Trace, fnNames ...string)
 	// Shortcut for RegisterChannelOnEnter + RegisterChannelOnExit
-	RegisterChannel(in chan *Trace, fnNames ...string)
+	RegisterChannel(out chan<- *Trace, fnNames ...string)
 	// Register a channel where the Trace info
 	// will be sent in the enter phase
 	// for all the syscalls
-	RegisterGlobalChannelOnEnter(in chan *Trace)
+	RegisterGlobalChannelOnEnter(out chan<- *Trace)
 	// Register a channel where the Trace info
 	// will be sent in the exit phase
 	// for all the syscalls
-	RegisterGlobalChannelOnExit(in chan *Trace)
+	RegisterGlobalChannelOnExit(out chan<- *Trace)
 	// Shortcut for RegisterGlobalChannelOnEnter + RegisterGlobalChannelOnExit
-	RegisterGlobalChannel(in chan *Trace)
+	RegisterGlobalChannel(out chan<- *Trace)
 
 	Run() error
 }
