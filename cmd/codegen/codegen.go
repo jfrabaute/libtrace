@@ -88,6 +88,9 @@ var syscalls = []*Signature{
 			if typ == "char" && p {
 				typ = "char *"
 				p = false
+			} else if typ == "unsigned char" && p {
+				typ = "unsigned char *"
+				p = false
 			}
 
 			if strings.Index(typ, "struct ") == 0 || strings.Index(typ, "union ") == 0 {
