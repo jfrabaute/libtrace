@@ -57,8 +57,6 @@ type TracerCb func(trace *Trace)
 type Arg struct {
 	Name string
 	Type reflect.Type
-	// True if the arg is a ptr to the type
-	Ptr bool
 	// True if the arg is a const
 	Const bool
 }

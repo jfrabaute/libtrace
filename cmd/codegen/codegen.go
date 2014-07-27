@@ -101,7 +101,10 @@ var syscalls = []*Signature{
 			if i > 0 {
 				out += ","
 			}
-			out += fmt.Sprintf(`Arg{Name: "%s", Type: %s, Ptr: %v, Const: %v}`, name, t, p, c)
+			if p {
+				t = "reflect.PtrTo(" + t + ")"
+			}
+			out += fmt.Sprintf(`Arg{Name: "%s", Type: %s, Const: %v}`, name, t, c)
 		}
 		out += "}"
 		out += "},"

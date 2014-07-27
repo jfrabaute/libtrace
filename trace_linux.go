@@ -67,8 +67,6 @@ func (t *tracerImpl) Run() (err error) {
 		}
 		t.callback(regsExit, true)
 	}
-
-	return
 }
 
 func wait_for_syscall(pid int) (exited bool, err error) {
