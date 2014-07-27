@@ -173,11 +173,11 @@ func (t *tracerImpl) populateArgs(trace *Trace, regs syscall.PtraceRegs) {
 	trace.Args = make([]interface{}, len(trace.Signature.Args))
 
 	for i, arg := range trace.Signature.Args {
-		trace.Args[i] = t.getRep(arg.Type, getParam(regs, i))
+		trace.Args[i] = t.decodeArg(arg.Type, getParam(regs, i))
 	}
 }
 
-func (t *tracerImpl) getRep(typ reflect.Type, value regParam) interface{} {
+func (t *tracerImpl) decodeArg(typ reflect.Type, value regParam) interface{} {
 	switch typ.Kind() {
 	case reflect.String:
 		out := []byte{0}
@@ -198,6 +198,12 @@ func (t *tracerImpl) getRep(typ reflect.Type, value regParam) interface{} {
 			i++
 		}
 		return "\"" + string(str) + "\""
+
+	case reflect.Int, reflect.Int8, reflect.Int16,
+		reflect.Int32, reflect.Int64, reflect.Uint,
+		reflect.Uint8, reflect.Uint16, reflect.Uint32,
+		reflect.Uint64, reflect.Float32, reflect.Float64:
+		return value
 	default:
 		return "NOTIMPL=" + fmt.Sprintf("%v", value)
 	}
