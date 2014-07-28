@@ -113,10 +113,9 @@ func (t *tracerImpl) callback_generic(regs syscall.PtraceRegs, exit bool) {
 
 	if exit {
 		trace.Errno = getExitCode(regs)
+		// Populate args values
+		t.populateArgs(&trace, regs)
 	}
-
-	// Populate args values
-	t.populateArgs(&trace, regs)
 
 	var l []TracerCb
 	if !exit {
