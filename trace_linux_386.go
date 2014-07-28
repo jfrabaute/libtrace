@@ -42,3 +42,7 @@ func (t *tracerImpl) callback(regs syscall.PtraceRegs, exit bool) {
 	// params: %ebx, %ecx, %edx, %esi, %edi, %ebp
 	t.callback_generic(regs, exit)
 }
+
+func (t *tracerImpl) customDecodeArgs(trace *Trace, regs syscall.PtraceRegs) bool {
+	return false
+}

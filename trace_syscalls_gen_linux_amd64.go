@@ -180,7 +180,7 @@ var syscalls = []*Signature{
 	&Signature{Id: 155, Name: "pivot_root", Args: []Arg{Arg{Name: "new_root", Type: type_stringc, Const: true}, Arg{Name: "put_old", Type: type_stringc, Const: true}}},
 	&Signature{Id: 156, Name: "_sysctl", Args: []Arg{Arg{Name: "args", Type: &type_unknownstruct, Const: false}}},
 	&Signature{Id: 157, Name: "prctl", Args: []Arg{Arg{Name: "option", Type: type_int, Const: false}, Arg{Name: "arg2", Type: type_uint64, Const: false}, Arg{Name: "arg3", Type: type_uint64, Const: false}, Arg{Name: "arg4", Type: type_uint64, Const: false}, Arg{Name: "arg5", Type: type_uint64, Const: false}}},
-	&Signature{Id: 158, Name: "arch_prctl", Args: []Arg{Arg{Name: "task", Type: &type_unknownstruct, Const: false}, Arg{Name: "code", Type: type_int, Const: false}, Arg{Name: "addr", Type: &type_uint64, Const: false}}},
+	&Signature{Id: 158, Name: "arch_prctl", Args: []Arg{Arg{Name: "code", Type: type_int, Const: false}, Arg{Name: "addr", Type: &type_uint64, Const: false}}},
 	&Signature{Id: 159, Name: "adjtimex", Args: []Arg{Arg{Name: "txc_p", Type: &type_unknownstruct, Const: false}}},
 	&Signature{Id: 160, Name: "setrlimit", Args: []Arg{Arg{Name: "resource", Type: type_uint32, Const: false}, Arg{Name: "rlim", Type: &type_unknownstruct, Const: false}}},
 	&Signature{Id: 161, Name: "chroot", Args: []Arg{Arg{Name: "filename", Type: type_stringc, Const: true}}},

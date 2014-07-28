@@ -1,8 +1,10 @@
 package libtrace
 
 import (
+	"encoding/binary"
 	"fmt"
 	"log"
+	"reflect"
 	"runtime"
 	"syscall"
 )
@@ -114,7 +116,7 @@ func (t *tracerImpl) callback_generic(regs syscall.PtraceRegs, exit bool) {
 	if exit {
 		trace.Errno = getExitCode(regs)
 		// Populate args values
-		t.populateArgs(&trace, regs)
+		t.decodeArgs(&trace, regs)
 	}
 
 	var l []TracerCb
@@ -161,15 +163,19 @@ func (t *tracerImpl) callback_generic(regs syscall.PtraceRegs, exit bool) {
 	}
 }
 
-func (t *tracerImpl) populateArgs(trace *Trace, regs syscall.PtraceRegs) {
+func (t *tracerImpl) decodeArgs(trace *Trace, regs syscall.PtraceRegs) {
 	if len(trace.Signature.Args) == 0 {
 		return
 	}
 
 	trace.Args = make([]interface{}, len(trace.Signature.Args))
 
-	for i, arg := range trace.Signature.Args {
-		trace.Args[i] = t.decodeArg(arg.Type, getParam(regs, i))
+	defaultDecode := t.customDecodeArgs(trace, regs)
+
+	if defaultDecode {
+		for i, arg := range trace.Signature.Args {
+			trace.Args[i] = t.decodeArg(arg.Type, getParam(regs, i))
+		}
 	}
 }
 
@@ -183,8 +189,18 @@ func (t *tracerImpl) decodeArg(typ interface{}, value regParam) interface{} {
 		uint8, uint16, uint32,
 		uint64, float32, float64:
 		return value
+	case *uint64:
+		var out []byte = make([]byte, 8)
+		count, err := syscall.PtracePeekData(t.cmd.Process.Pid, uintptr(value), out)
+		if err != nil {
+			log.Printf("Error while reading syscall arg: %s", err)
+		}
+		if count != 8 {
+			log.Printf("Error while reading syscall arg: count = %d (should be 8)", count)
+		}
+		return binary.LittleEndian.Uint64(out)
 	default:
-		return "NOTIMPL=" + fmt.Sprintf("%v", value)
+		return fmt.Sprintf("%v", value) + "(NOTIMPL=" + reflect.TypeOf(typ).String() + ")"
 	}
 }
 
@@ -203,7 +219,7 @@ func (t *tracerImpl) decodeArgStringC(value regParam) interface{} {
 			break
 		}
 		if err != nil {
-			log.Printf("Error while reading syscal arg: %s", err)
+			log.Printf("Error while reading syscall arg: %s", err)
 		}
 		if count != 1 {
 			log.Printf("Error while reading syscall arg: count = %d (should be 1)", count)

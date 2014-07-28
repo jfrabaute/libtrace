@@ -43,3 +43,32 @@ func (t *tracerImpl) callback(regs syscall.PtraceRegs, exit bool) {
 	// params: %rdi, %rsi, %rdx, %rcx, %r8, %r9
 	t.callback_generic(regs, exit)
 }
+
+func (t *tracerImpl) customDecodeArgs(trace *Trace, regs syscall.PtraceRegs) bool {
+	switch trace.Id {
+	case 158 /*arch_prctl*/ :
+		code := getParam(regs, 0)
+		switch code {
+		case /*ARCH_SET_GS*/ 0x1001:
+			trace.Args[0] = "ARCH_SET_GS"
+			trace.Args[1] = getParam(regs, 1)
+		case /*ARCH_SET_FS*/ 0x1002:
+			trace.Args[0] = "ARCH_SET_FS"
+			trace.Args[1] = getParam(regs, 1)
+		case /*ARCH_GET_FS*/ 0x1003:
+			trace.Args[0] = "ARCH_GET_FS"
+			// TODO: Read pointer to
+			trace.Args[1] = t.decodeArg(&type_uint64, getParam(regs, 1))
+		case /*ARCH_GET_GS*/ 0x1004:
+			trace.Args[0] = "ARCH_GET_GS"
+			// TODO: Read pointer to
+			trace.Args[1] = t.decodeArg(&type_uint64, getParam(regs, 1))
+		default:
+			trace.Args[0] = "*Unknown*"
+			trace.Args[1] = getParam(regs, 1)
+		}
+		return false
+	default:
+		return true
+	}
+}

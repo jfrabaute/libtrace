@@ -156,7 +156,7 @@
 155	sys_pivot_root	const char *new_root	const char *put_old				
 156	sys__sysctl	struct __sysctl_args *args					
 157	sys_prctl	int option	unsigned long arg2	unsigned long arg3	unsigned long arg4		unsigned long arg5
-158	sys_arch_prctl	struct task_struct *task	int code	unsigned long *addr			
+158	sys_arch_prctl	int code	unsigned long *addr			
 159	sys_adjtimex	struct timex *txc_p					
 160	sys_setrlimit	unsigned int resource	struct rlimit *rlim				
 161	sys_chroot	const char *filename					
