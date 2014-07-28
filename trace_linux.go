@@ -178,24 +178,7 @@ func (t *tracerImpl) populateArgs(trace *Trace, regs syscall.PtraceRegs) {
 func (t *tracerImpl) decodeArg(typ reflect.Type, value regParam) interface{} {
 	switch typ.Kind() {
 	case reflect.String:
-		out := []byte{0}
-		str := make([]byte, 0, 10)
-		i := 0
-		for {
-			count, err := syscall.PtracePeekData(t.cmd.Process.Pid, uintptr(value+regParam(i)), out)
-			if out[0] == 0 {
-				break
-			}
-			if err != nil {
-				log.Printf("Error while reading syscal arg: %s", err)
-			}
-			if count != 1 {
-				log.Printf("Error while reading syscall arg: count = %d (should be 1)", count)
-			}
-			str = append(str, out[0])
-			i++
-		}
-		return "\"" + string(str) + "\""
+		return t.decodeArgString(value)
 
 	case reflect.Int, reflect.Int8, reflect.Int16,
 		reflect.Int32, reflect.Int64, reflect.Uint,
@@ -205,4 +188,49 @@ func (t *tracerImpl) decodeArg(typ reflect.Type, value regParam) interface{} {
 	default:
 		return "NOTIMPL=" + fmt.Sprintf("%v", value)
 	}
+}
+
+func (t *tracerImpl) decodeArgString(value regParam) interface{} {
+	out := []byte{0}
+	str := make([]byte, 0, 10)
+	i := 0
+	extra := false
+	for {
+		count, err := syscall.PtracePeekData(t.cmd.Process.Pid, uintptr(value+regParam(i)), out)
+		if out[0] == 0 {
+			break
+		}
+		if i > 32 /*strsize to display*/ {
+			extra = true
+			break
+		}
+		if err != nil {
+			log.Printf("Error while reading syscal arg: %s", err)
+		}
+		if count != 1 {
+			log.Printf("Error while reading syscall arg: count = %d (should be 1)", count)
+		}
+		switch {
+		case out[0] == '\n':
+			str = append(str, '\\', 'n')
+		case out[0] == '\r':
+			str = append(str, '\\', 'r')
+		case out[0] == '\t':
+			str = append(str, '\\', 't')
+		case out[0] >= ' ' && out[0] <= '~':
+			str = append(str, out[0])
+		default:
+			str = append(str, []byte(fmt.Sprintf("\\%d", out[0]))...)
+		}
+
+		i++
+	}
+
+	result := "\"" + string(str) + "\""
+	if extra {
+		result += "..."
+	}
+
+	return result
+
 }
