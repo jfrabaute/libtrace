@@ -182,6 +182,12 @@ func (t *tracerImpl) decodeReturnCode(trace *Trace) {
 }
 
 func (t *tracerImpl) decodeArgs(trace *Trace, regs syscall.PtraceRegs) {
+	if trace.Signature.Args == nil {
+		trace.Args = []ArgValue{
+			ArgValue{Str: "*ARGSNOTDEFINED*"},
+		}
+		return
+	}
 	if len(trace.Signature.Args) == 0 {
 		return
 	}
