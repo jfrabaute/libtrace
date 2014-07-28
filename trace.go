@@ -1,7 +1,5 @@
 package libtrace
 
-import "reflect"
-
 type Tracer interface {
 	// Register a callback that will be called
 	// in the enter phase when
@@ -56,7 +54,7 @@ type TracerCb func(trace *Trace)
 
 type Arg struct {
 	Name string
-	Type reflect.Type
+	Type interface{} // Zero value of the type, so we can use type switch to decode it
 	// True if the arg is a const
 	Const bool
 }
@@ -66,3 +64,8 @@ type Signature struct {
 	Name string
 	Args []Arg
 }
+
+// Custom types
+type StringC string      // String arg passed as C String (null terminated)
+type StringBuffer string // String arg passed with a "count" value
+type Buffer []byte

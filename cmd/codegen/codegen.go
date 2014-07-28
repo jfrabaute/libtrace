@@ -27,7 +27,26 @@ func main() {
 
 	fmt.Println(`package libtrace
 
-import "reflect"
+var (
+	type_int = int(0)
+	type_uint = uint(0)
+	type_int8 = int8(0)
+	type_int16 = int16(0)
+	type_int32 = int32(0)
+	type_int64 = int64(0)
+	type_uint8 = uint8(0)
+	type_uint16 = uint16(0)
+	type_uint32 = uint32(0)
+	type_uint64 = uint64(0)
+	type_uintptr = uintptr(0)
+	type_float32 = float32(0)
+	type_float64 = float64(0)
+	type_stringc = StringC("")
+	type_stringbuffer = StringBuffer("")
+	type_buffer = []byte{}
+
+	type_unknownstruct = struct{}{}
+)
 
 var syscalls = []*Signature{
 `)
@@ -94,7 +113,7 @@ var syscalls = []*Signature{
 			}
 
 			if strings.Index(typ, "struct ") == 0 || strings.Index(typ, "union ") == 0 {
-				t = "reflect.TypeOf(struct{}{})"
+				t = "type_unknownstruct"
 			} else if t, ok = types.Types[typ]; !ok {
 				log.Fatalf("Unable to find type: '%s'\nrec= %+v", typ, rec)
 			}
@@ -102,7 +121,7 @@ var syscalls = []*Signature{
 				out += ","
 			}
 			if p {
-				t = "reflect.PtrTo(" + t + ")"
+				t = "&" + t
 			}
 			out += fmt.Sprintf(`Arg{Name: "%s", Type: %s, Const: %v}`, name, t, c)
 		}

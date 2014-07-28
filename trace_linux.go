@@ -3,7 +3,6 @@ package libtrace
 import (
 	"fmt"
 	"log"
-	"reflect"
 	"runtime"
 	"syscall"
 )
@@ -175,22 +174,22 @@ func (t *tracerImpl) populateArgs(trace *Trace, regs syscall.PtraceRegs) {
 	}
 }
 
-func (t *tracerImpl) decodeArg(typ reflect.Type, value regParam) interface{} {
-	switch typ.Kind() {
-	case reflect.String:
-		return t.decodeArgString(value)
+func (t *tracerImpl) decodeArg(typ interface{}, value regParam) interface{} {
+	switch typ.(type) {
+	case StringC:
+		return t.decodeArgStringC(value)
 
-	case reflect.Int, reflect.Int8, reflect.Int16,
-		reflect.Int32, reflect.Int64, reflect.Uint,
-		reflect.Uint8, reflect.Uint16, reflect.Uint32,
-		reflect.Uint64, reflect.Float32, reflect.Float64:
+	case int, int8, int16,
+		int32, int64, uint,
+		uint8, uint16, uint32,
+		uint64, float32, float64:
 		return value
 	default:
 		return "NOTIMPL=" + fmt.Sprintf("%v", value)
 	}
 }
 
-func (t *tracerImpl) decodeArgString(value regParam) interface{} {
+func (t *tracerImpl) decodeArgStringC(value regParam) interface{} {
 	out := []byte{0}
 	str := make([]byte, 0, 10)
 	i := 0
