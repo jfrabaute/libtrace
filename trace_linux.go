@@ -168,27 +168,29 @@ func (t *tracerImpl) decodeArgs(trace *Trace, regs syscall.PtraceRegs) {
 		return
 	}
 
-	trace.Args = make([]interface{}, len(trace.Signature.Args))
+	trace.Args = make([]ArgValue, len(trace.Signature.Args))
 
 	defaultDecode := t.customDecodeArgs(trace, regs)
 
 	if defaultDecode {
 		for i, arg := range trace.Signature.Args {
-			trace.Args[i] = t.decodeArg(arg.Type, getParam(regs, i))
+			t.decodeArg(arg.Type, getParam(regs, i), &trace.Args[i])
 		}
 	}
 }
 
-func (t *tracerImpl) decodeArg(typ interface{}, value regParam) interface{} {
+func (t *tracerImpl) decodeArg(typ interface{}, value regParam, argValue *ArgValue) {
 	switch typ.(type) {
 	case StringC:
-		return t.decodeArgStringC(value)
+		argValue.Str = t.decodeArgStringC(value)
+		argValue.Value = argValue.Str
 
 	case int, int8, int16,
 		int32, int64, uint,
 		uint8, uint16, uint32,
 		uint64, float32, float64:
-		return value
+		argValue.Value = value
+		argValue.Str = fmt.Sprintf("%d", argValue.Value)
 	case *uint64:
 		var out []byte = make([]byte, 8)
 		count, err := syscall.PtracePeekData(t.cmd.Process.Pid, uintptr(value), out)
@@ -198,13 +200,15 @@ func (t *tracerImpl) decodeArg(typ interface{}, value regParam) interface{} {
 		if count != 8 {
 			log.Printf("Error while reading syscall arg: count = %d (should be 8)", count)
 		}
-		return binary.LittleEndian.Uint64(out)
+		argValue.Value = binary.LittleEndian.Uint64(out)
+		argValue.Str = fmt.Sprintf("%d", argValue.Value)
 	default:
-		return fmt.Sprintf("%v", value) + "(NOTIMPL=" + reflect.TypeOf(typ).String() + ")"
+		argValue.Value = value
+		argValue.Str = fmt.Sprintf("%v", value) + "(NOTIMPL=" + reflect.TypeOf(typ).String() + ")"
 	}
 }
 
-func (t *tracerImpl) decodeArgStringC(value regParam) interface{} {
+func (t *tracerImpl) decodeArgStringC(value regParam) string {
 	out := []byte{0}
 	str := make([]byte, 0, 10)
 	i := 0

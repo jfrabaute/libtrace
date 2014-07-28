@@ -43,11 +43,20 @@ type Tracer interface {
 	Run() error
 }
 
+type ArgValue struct {
+	Value interface{}
+	Str   string // String representation of the value
+}
+
+func (arg ArgValue) String() string {
+	return arg.Str
+}
+
 type Trace struct {
 	*Signature
-	Args  []interface{} // Args passed in
-	Errno ExitCode      // Result
-	Exit  bool          // false when entering the syscal, true when exiting
+	Args  []ArgValue // Args passed in
+	Errno ExitCode   // Result
+	Exit  bool       // false when entering the syscal, true when exiting
 }
 
 type TracerCb func(trace *Trace)
