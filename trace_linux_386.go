@@ -44,7 +44,7 @@ func (t *tracerImpl) callback(regs syscall.PtraceRegs, exit bool) {
 }
 
 func (t *tracerImpl) customDecodeArgs(trace *Trace, regs syscall.PtraceRegs) bool {
-	return false
+	return true
 }
 
 var decodeReturnCodeFnMap = map[SyscallId]decodeReturnCodeFn{}
