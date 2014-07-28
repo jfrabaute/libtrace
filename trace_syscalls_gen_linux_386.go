@@ -22,7 +22,7 @@ var (
 )
 
 var syscalls = []*Signature{
-
+	&Signature{Id: 0, Name: "restart_syscall", Args: nil},
 	&Signature{Id: 1, Name: "exit", Args: []Arg{Arg{Name: "error_code", Type: type_int, Const: false}}},
 	&Signature{Id: 2, Name: "fork", Args: []Arg{Arg{Name: "regs", Type: &type_unknownstruct, Const: false}}},
 	&Signature{Id: 3, Name: "read", Args: []Arg{Arg{Name: "fd", Type: type_uint, Const: false}, Arg{Name: "buf", Type: type_stringc, Const: false}, Arg{Name: "count", Type: type_uint64, Const: false}}},
@@ -212,5 +212,261 @@ var syscalls = []*Signature{
 	&Signature{Id: 187, Name: "sendfile", Args: []Arg{Arg{Name: "out_fd", Type: type_int, Const: false}, Arg{Name: "in_fd", Type: type_int, Const: false}, Arg{Name: "offset", Type: &type_uint32, Const: false}, Arg{Name: "count", Type: type_uint64, Const: false}}},
 	&unknownSignature, // 187
 	&unknownSignature, // 188
+	&unknownSignature, // 189
 	&Signature{Id: 190, Name: "vfork", Args: []Arg{Arg{Name: "regs", Type: &type_unknownstruct, Const: false}}},
+	&Signature{Id: 191, Name: "getrlimit", Args: nil},
+	&Signature{Id: 192, Name: "mmap2", Args: nil},
+	&Signature{Id: 193, Name: "truncate64", Args: nil},
+	&Signature{Id: 194, Name: "ftruncate64", Args: nil},
+	&Signature{Id: 195, Name: "stat64", Args: nil},
+	&Signature{Id: 196, Name: "lstat64", Args: nil},
+	&Signature{Id: 197, Name: "fstat64", Args: nil},
+	&Signature{Id: 198, Name: "lchown32", Args: nil},
+	&Signature{Id: 199, Name: "getuid32", Args: nil},
+
+	&Signature{Id: 200, Name: "getgid32", Args: nil},
+	&Signature{Id: 201, Name: "geteuid32", Args: nil},
+	&Signature{Id: 202, Name: "getegid32", Args: nil},
+	&Signature{Id: 203, Name: "setreuid32", Args: nil},
+	&Signature{Id: 204, Name: "setregid32", Args: nil},
+	&Signature{Id: 205, Name: "getgroups32", Args: nil},
+	&Signature{Id: 206, Name: "setgroups32", Args: nil},
+	&Signature{Id: 207, Name: "fchown32", Args: nil},
+	&Signature{Id: 208, Name: "setresuid32", Args: nil},
+	&Signature{Id: 209, Name: "getresuid32", Args: nil},
+	&Signature{Id: 210, Name: "setresgid32", Args: nil},
+	&Signature{Id: 211, Name: "getresgid32", Args: nil},
+	&Signature{Id: 212, Name: "chown32", Args: nil},
+	&Signature{Id: 213, Name: "setuid32", Args: nil},
+	&Signature{Id: 214, Name: "setgid32", Args: nil},
+	&Signature{Id: 215, Name: "setfsuid32", Args: nil},
+	&Signature{Id: 216, Name: "setfsgid32", Args: nil},
+	&Signature{Id: 217, Name: "pivot_root", Args: nil},
+	&Signature{Id: 218, Name: "mincore", Args: nil},
+	&Signature{Id: 219, Name: "madvise", Args: nil},
+	&Signature{Id: 220, Name: "getdents64", Args: nil},
+	&Signature{Id: 221, Name: "fcntl64", Args: nil},
+	&unknownSignature, // 222
+	&Signature{Id: 223, Name: "security", Args: nil},
+	&Signature{Id: 224, Name: "gettid", Args: nil},
+	&Signature{Id: 225, Name: "readahead", Args: nil},
+	&Signature{Id: 226, Name: "setxattr", Args: nil},
+	&Signature{Id: 227, Name: "lsetxattr", Args: nil},
+	&Signature{Id: 228, Name: "fsetxattr", Args: nil},
+	&Signature{Id: 229, Name: "getxattr", Args: nil},
+	&Signature{Id: 230, Name: "lgetxattr", Args: nil},
+	&Signature{Id: 231, Name: "fgetxattr", Args: nil},
+	&Signature{Id: 232, Name: "listxattr", Args: nil},
+	&Signature{Id: 233, Name: "llistxattr", Args: nil},
+	&Signature{Id: 234, Name: "flistxattr", Args: nil},
+	&Signature{Id: 235, Name: "removexattr", Args: nil},
+	&Signature{Id: 236, Name: "lremovexattr", Args: nil},
+	&Signature{Id: 237, Name: "fremovexattr", Args: nil},
+	&Signature{Id: 238, Name: "tkill", Args: nil},
+	&Signature{Id: 239, Name: "sendfile64", Args: nil},
+	&Signature{Id: 240, Name: "futex", Args: nil},
+	&Signature{Id: 241, Name: "sched_setaffinity", Args: nil},
+	&Signature{Id: 242, Name: "sched_getaffinity", Args: nil},
+	&Signature{Id: 243, Name: "set_thread_area", Args: nil},
+	&Signature{Id: 244, Name: "get_thread_area", Args: nil},
+	&Signature{Id: 245, Name: "io_setup", Args: nil},
+	&Signature{Id: 246, Name: "io_destroy", Args: nil},
+	&Signature{Id: 247, Name: "io_getevents", Args: nil},
+	&Signature{Id: 248, Name: "io_submit", Args: nil},
+	&Signature{Id: 249, Name: "io_cancel", Args: nil},
+	&Signature{Id: 250, Name: "fadvise64", Args: nil},
+	&unknownSignature, // 251
+	&Signature{Id: 252, Name: "exit_group", Args: nil},
+	&Signature{Id: 253, Name: "lookup_dcookie", Args: nil},
+	&Signature{Id: 254, Name: "epoll_create", Args: nil},
+	&Signature{Id: 255, Name: "epoll_ctl", Args: nil},
+	&Signature{Id: 256, Name: "epoll_wait", Args: nil},
+	&Signature{Id: 257, Name: "remap_file_pages", Args: nil},
+	&Signature{Id: 258, Name: "set_tid_address", Args: nil},
+	&Signature{Id: 259, Name: "timer_create", Args: nil},
+	&Signature{Id: 260, Name: "timer_settime", Args: nil},
+	&Signature{Id: 261, Name: "timer_gettime", Args: nil},
+	&Signature{Id: 262, Name: "timer_getoverrun", Args: nil},
+	&Signature{Id: 263, Name: "timer_delete", Args: nil},
+	&Signature{Id: 264, Name: "clock_settime", Args: nil},
+	&Signature{Id: 265, Name: "clock_gettime", Args: nil},
+	&Signature{Id: 266, Name: "clock_getres", Args: nil},
+	&Signature{Id: 267, Name: "clock_nanosleep", Args: nil},
+	&Signature{Id: 268, Name: "statfs64", Args: nil},
+	&Signature{Id: 269, Name: "fstatfs64", Args: nil},
+	&Signature{Id: 270, Name: "tgkill", Args: nil},
+	&Signature{Id: 271, Name: "utimes", Args: nil},
+	&Signature{Id: 272, Name: "fadvise64_64", Args: nil},
+	&Signature{Id: 273, Name: "vserver", Args: nil},
+	&Signature{Id: 274, Name: "mbind", Args: nil},
+	&Signature{Id: 275, Name: "get_mempolicy", Args: nil},
+	&Signature{Id: 276, Name: "set_mempolicy", Args: nil},
+	&Signature{Id: 277, Name: "mq_open", Args: nil},
+	&Signature{Id: 278, Name: "mq_unlink", Args: nil},
+	&Signature{Id: 279, Name: "mq_timedsend", Args: nil},
+	&Signature{Id: 280, Name: "mq_timedreceive", Args: nil},
+	&Signature{Id: 281, Name: "mq_notify", Args: nil},
+	&Signature{Id: 282, Name: "mq_getsetattr", Args: nil},
+	&Signature{Id: 283, Name: "kexec_load", Args: nil},
+	&Signature{Id: 284, Name: "waitid", Args: nil},
+	&unknownSignature, // 285
+	&Signature{Id: 286, Name: "add_key", Args: nil},
+	&Signature{Id: 287, Name: "request_key", Args: nil},
+	&Signature{Id: 288, Name: "keyctl", Args: nil},
+	&Signature{Id: 289, Name: "ioprio_set", Args: nil},
+	&Signature{Id: 290, Name: "ioprio_get", Args: nil},
+	&Signature{Id: 291, Name: "inotify_init", Args: nil},
+	&Signature{Id: 292, Name: "inotify_add_watch", Args: nil},
+	&Signature{Id: 293, Name: "inotify_rm_watch", Args: nil},
+	&Signature{Id: 294, Name: "migrate_pages", Args: nil},
+	&Signature{Id: 295, Name: "openat", Args: nil},
+	&Signature{Id: 296, Name: "mkdirat", Args: nil},
+	&Signature{Id: 297, Name: "mknodat", Args: nil},
+	&Signature{Id: 298, Name: "fchownat", Args: nil},
+	&Signature{Id: 299, Name: "futimesat", Args: nil},
+	&Signature{Id: 300, Name: "fstatat64", Args: nil},
+	&Signature{Id: 301, Name: "unlinkat", Args: nil},
+	&Signature{Id: 302, Name: "renameat", Args: nil},
+	&Signature{Id: 303, Name: "linkat", Args: nil},
+	&Signature{Id: 304, Name: "symlinkat", Args: nil},
+	&Signature{Id: 305, Name: "readlinkat", Args: nil},
+	&Signature{Id: 306, Name: "fchmodat", Args: nil},
+	&Signature{Id: 307, Name: "faccessat", Args: nil},
+	&Signature{Id: 308, Name: "pselect6", Args: nil},
+	&Signature{Id: 309, Name: "ppoll", Args: nil},
+	&Signature{Id: 310, Name: "unshare", Args: nil},
+	&Signature{Id: 311, Name: "set_robust_list", Args: nil},
+	&Signature{Id: 312, Name: "get_robust_list", Args: nil},
+	&Signature{Id: 313, Name: "splice", Args: nil},
+	&Signature{Id: 314, Name: "sync_file_range", Args: nil},
+	&Signature{Id: 315, Name: "tee", Args: nil},
+	&Signature{Id: 316, Name: "vmsplice", Args: nil},
+	&Signature{Id: 317, Name: "move_pages", Args: nil},
+	&Signature{Id: 318, Name: "getcpu", Args: nil},
+	&Signature{Id: 319, Name: "epoll_pwait", Args: nil},
+	&Signature{Id: 320, Name: "utimensat", Args: nil},
+	&Signature{Id: 321, Name: "signalfd", Args: nil},
+	&Signature{Id: 322, Name: "timerfd_create", Args: nil},
+	&Signature{Id: 323, Name: "eventfd", Args: nil},
+	&Signature{Id: 324, Name: "fallocate", Args: nil},
+	&Signature{Id: 325, Name: "timerfd_settime", Args: nil},
+	&Signature{Id: 326, Name: "timerfd_gettime", Args: nil},
+	&Signature{Id: 327, Name: "signalfd4", Args: nil},
+	&Signature{Id: 328, Name: "eventfd2", Args: nil},
+	&Signature{Id: 329, Name: "epoll_create1", Args: nil},
+	&Signature{Id: 330, Name: "dup3", Args: nil},
+	&Signature{Id: 331, Name: "pipe2", Args: nil},
+	&Signature{Id: 332, Name: "inotify_init1", Args: nil},
+	&Signature{Id: 333, Name: "preadv", Args: nil},
+	&Signature{Id: 334, Name: "pwritev", Args: nil},
+	&Signature{Id: 335, Name: "rt_tgsigqueueinfo", Args: nil},
+	&Signature{Id: 336, Name: "perf_event_open", Args: nil},
+	&Signature{Id: 337, Name: "recvmmsg", Args: nil},
+	&Signature{Id: 338, Name: "fanotify_init", Args: nil},
+	&Signature{Id: 339, Name: "fanotify_mark", Args: nil},
+	&Signature{Id: 340, Name: "prlimit64", Args: nil},
+	&Signature{Id: 341, Name: "name_to_handle_at", Args: nil},
+	&Signature{Id: 342, Name: "open_by_handle_at", Args: nil},
+	&Signature{Id: 343, Name: "clock_adjtime", Args: nil},
+	&Signature{Id: 344, Name: "syncfs", Args: nil},
+	&Signature{Id: 345, Name: "sendmmsg", Args: nil},
+	&Signature{Id: 346, Name: "setns", Args: nil},
+	&Signature{Id: 347, Name: "process_vm_readv", Args: nil},
+	&Signature{Id: 348, Name: "process_vm_writev", Args: nil},
+	&Signature{Id: 349, Name: "kcmp", Args: nil},
+	&Signature{Id: 350, Name: "finit_module", Args: nil},
+	&unknownSignature, // 351
+	&unknownSignature, // 352
+	&unknownSignature, // 353
+	&unknownSignature, // 354
+	&unknownSignature, // 355
+	&unknownSignature, // 356
+	&unknownSignature, // 357
+	&unknownSignature, // 358
+	&unknownSignature, // 359
+	&unknownSignature, // 360
+	&unknownSignature, // 361
+	&unknownSignature, // 362
+	&unknownSignature, // 363
+	&unknownSignature, // 364
+	&unknownSignature, // 365
+	&unknownSignature, // 366
+	&unknownSignature, // 367
+	&unknownSignature, // 368
+	&unknownSignature, // 369
+	&unknownSignature, // 370
+	&unknownSignature, // 371
+	&unknownSignature, // 372
+	&unknownSignature, // 373
+	&unknownSignature, // 374
+	&unknownSignature, // 375
+	&unknownSignature, // 376
+	&unknownSignature, // 377
+	&unknownSignature, // 378
+	&unknownSignature, // 379
+	&unknownSignature, // 380
+	&unknownSignature, // 381
+	&unknownSignature, // 382
+	&unknownSignature, // 383
+	&unknownSignature, // 384
+	&unknownSignature, // 385
+	&unknownSignature, // 386
+	&unknownSignature, // 387
+	&unknownSignature, // 388
+	&unknownSignature, // 389
+	&unknownSignature, // 390
+	&unknownSignature, // 391
+	&unknownSignature, // 392
+	&unknownSignature, // 393
+	&unknownSignature, // 394
+	&unknownSignature, // 395
+	&unknownSignature, // 396
+	&unknownSignature, // 397
+	&unknownSignature, // 398
+	&unknownSignature, // 399
+	&Signature{Id: 400, Name: "socket_subcall", Args: nil},
+	&Signature{Id: 401, Name: "socket", Args: nil},
+	&Signature{Id: 402, Name: "bind", Args: nil},
+	&Signature{Id: 403, Name: "connect", Args: nil},
+	&Signature{Id: 404, Name: "listen", Args: nil},
+	&Signature{Id: 405, Name: "accept", Args: nil},
+	&Signature{Id: 406, Name: "getsockname", Args: nil},
+	&Signature{Id: 407, Name: "getpeername", Args: nil},
+	&Signature{Id: 408, Name: "socketpair", Args: nil},
+	&Signature{Id: 409, Name: "send", Args: nil},
+	&Signature{Id: 410, Name: "recv", Args: nil},
+	&Signature{Id: 411, Name: "sendto", Args: nil},
+	&Signature{Id: 412, Name: "recvfrom", Args: nil},
+	&Signature{Id: 413, Name: "shutdown", Args: nil},
+	&Signature{Id: 414, Name: "setsockopt", Args: nil},
+	&Signature{Id: 415, Name: "getsockopt", Args: nil},
+	&Signature{Id: 416, Name: "sendmsg", Args: nil},
+	&Signature{Id: 417, Name: "recvmsg", Args: nil},
+	&Signature{Id: 418, Name: "accept4", Args: nil},
+	&Signature{Id: 419, Name: "recvmmsg", Args: nil},
+	&Signature{Id: 420, Name: "ipc_subcall", Args: nil},
+	&Signature{Id: 421, Name: "semop", Args: nil},
+	&Signature{Id: 422, Name: "semget", Args: nil},
+	&Signature{Id: 423, Name: "semctl", Args: nil},
+	&Signature{Id: 424, Name: "semtimedop", Args: nil},
+	&Signature{Id: 425, Name: "ipc_subcall", Args: nil},
+	&Signature{Id: 426, Name: "ipc_subcall", Args: nil},
+	&Signature{Id: 427, Name: "ipc_subcall", Args: nil},
+	&Signature{Id: 428, Name: "ipc_subcall", Args: nil},
+	&Signature{Id: 429, Name: "ipc_subcall", Args: nil},
+	&Signature{Id: 430, Name: "ipc_subcall", Args: nil},
+	&Signature{Id: 431, Name: "msgsnd", Args: nil},
+	&Signature{Id: 432, Name: "msgrcv", Args: nil},
+	&Signature{Id: 433, Name: "msgget", Args: nil},
+	&Signature{Id: 434, Name: "msgctl", Args: nil},
+	&Signature{Id: 435, Name: "ipc_subcall", Args: nil},
+	&Signature{Id: 436, Name: "ipc_subcall", Args: nil},
+	&Signature{Id: 437, Name: "ipc_subcall", Args: nil},
+	&Signature{Id: 438, Name: "ipc_subcall", Args: nil},
+	&Signature{Id: 439, Name: "ipc_subcall", Args: nil},
+	&Signature{Id: 440, Name: "ipc_subcall", Args: nil},
+	&Signature{Id: 441, Name: "shmat", Args: nil},
+	&Signature{Id: 442, Name: "shmdt", Args: nil},
+	&Signature{Id: 443, Name: "shmget", Args: nil},
+	&Signature{Id: 444, Name: "shmctl", Args: nil},
 }

@@ -111,8 +111,17 @@ func (t *tracerImpl) callback_generic(regs syscall.PtraceRegs, exit bool) {
 	}
 	if id < SyscallId(len(syscalls)) {
 		trace.Signature = syscalls[id]
+		if trace.Signature == &unknownSignature {
+			trace.Signature = &Signature{}
+			*trace.Signature = unknownSignature
+			trace.Signature.Id = id
+			trace.Signature.Name = fmt.Sprintf("*UNKNOWN(%d)*", id)
+		}
 	} else {
-		trace.Signature = &unknownSignature
+		trace.Signature = &Signature{}
+		*trace.Signature = unknownSignature
+		trace.Signature.Id = id
+		trace.Signature.Name = fmt.Sprintf("*UNKNOWN(%d)*", id)
 	}
 
 	if exit {
