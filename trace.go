@@ -52,11 +52,16 @@ func (arg ArgValue) String() string {
 	return arg.Str
 }
 
+type ReturnValue struct {
+	Code        ReturnCode
+	Description string
+}
+
 type Trace struct {
 	*Signature
-	Args  []ArgValue // Args passed in
-	Errno ExitCode   // Result
-	Exit  bool       // false when entering the syscal, true when exiting
+	Args   []ArgValue  // Args passed in
+	Return ReturnValue // Result
+	Exit   bool        // false when entering the syscal, true when exiting
 }
 
 type TracerCb func(trace *Trace)

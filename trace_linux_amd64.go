@@ -7,7 +7,7 @@ import (
 
 type SyscallId uint64
 
-type ExitCode int32
+type ReturnCode int32
 
 type regParam uint64
 
@@ -31,8 +31,8 @@ func getParam(regs syscall.PtraceRegs, i int) regParam {
 	return 0
 }
 
-func getExitCode(regs syscall.PtraceRegs) ExitCode {
-	return ExitCode(regs.Rax)
+func getReturnCode(regs syscall.PtraceRegs) ReturnCode {
+	return ReturnCode(regs.Rax)
 }
 
 func getSyscallId(regs syscall.PtraceRegs) SyscallId {
@@ -70,4 +70,8 @@ func (t *tracerImpl) customDecodeArgs(trace *Trace, regs syscall.PtraceRegs) boo
 	default:
 		return true
 	}
+}
+
+var decodeReturnCodeFnMap = map[SyscallId]decodeReturnCodeFn{
+	2 /*open*/ : decodeReturnCodeLinux,
 }

@@ -7,7 +7,7 @@ import (
 
 type SyscallId int32
 
-type ExitCode int32
+type ReturnCode int32
 
 type regParam int32
 
@@ -30,8 +30,8 @@ func getParam(regs syscall.PtraceRegs, i int) regParam {
 	return 0
 }
 
-func getExitCode(regs syscall.PtraceRegs) ExitCode {
-	return ExitCode(regs.Eax)
+func getReturnCode(regs syscall.PtraceRegs) ReturnCode {
+	return ReturnCode(regs.Eax)
 }
 
 func getSyscallId(regs syscall.PtraceRegs) SyscallId {
@@ -46,3 +46,5 @@ func (t *tracerImpl) callback(regs syscall.PtraceRegs, exit bool) {
 func (t *tracerImpl) customDecodeArgs(trace *Trace, regs syscall.PtraceRegs) bool {
 	return false
 }
+
+var decodeReturnCodeFnMap = map[SyscallId]decodeReturnCodeFn{}
