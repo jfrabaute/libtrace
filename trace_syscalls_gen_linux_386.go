@@ -210,7 +210,6 @@ var syscalls = []*Signature{
 	&Signature{Id: 185, Name: "capset", Args: []Arg{Arg{Name: "header", Type: type_unknownstruct, Const: false}, Arg{Name: "data", Type: type_unknownstruct, Const: true}}},
 	&Signature{Id: 186, Name: "sigaltstack", Args: []Arg{Arg{Name: "uss", Type: &type_unknownstruct, Const: true}, Arg{Name: "uoss", Type: &type_unknownstruct, Const: false}}},
 	&Signature{Id: 187, Name: "sendfile", Args: []Arg{Arg{Name: "out_fd", Type: type_int, Const: false}, Arg{Name: "in_fd", Type: type_int, Const: false}, Arg{Name: "offset", Type: &type_uint32, Const: false}, Arg{Name: "count", Type: type_uint64, Const: false}}},
-	&unknownSignature, // 187
 	&unknownSignature, // 188
 	&unknownSignature, // 189
 	&Signature{Id: 190, Name: "vfork", Args: []Arg{Arg{Name: "regs", Type: &type_unknownstruct, Const: false}}},
