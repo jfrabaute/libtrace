@@ -53,4 +53,6 @@ func (t *tracerImpl) customDecodeArgs(trace *Trace, regs syscall.PtraceRegs) boo
 	return true
 }
 
-var decodeReturnCodeFnMap = map[SyscallId]decodeReturnCodeFn{}
+var decodeReturnCodeFnMap = map[SyscallId]decodeReturnCodeFn{
+	5 /*open*/ : decodeReturnCodeLinux,
+}
