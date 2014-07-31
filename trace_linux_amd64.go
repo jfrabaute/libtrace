@@ -36,8 +36,8 @@ func getReturnCode(regs syscall.PtraceRegs) ReturnCode {
 	return ReturnCode(regs.Rax)
 }
 
-func getSyscallId(regs syscall.PtraceRegs) SyscallId {
-	return SyscallId(regs.Orig_rax)
+func getSyscallId(regs syscall.PtraceRegs) (SyscallId, int) {
+	return SyscallId(regs.Orig_rax), 0
 }
 
 func (t *tracerImpl) callback(regs syscall.PtraceRegs, exit bool) {

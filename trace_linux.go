@@ -104,7 +104,7 @@ type decodeReturnCodeFn func(trace *Trace)
 
 func (t *tracerImpl) callback_generic(regs syscall.PtraceRegs, exit bool) {
 
-	id := getSyscallId(regs)
+	id, argOffset := getSyscallId(regs)
 
 	trace := Trace{
 		Exit: exit,
@@ -128,7 +128,7 @@ func (t *tracerImpl) callback_generic(regs syscall.PtraceRegs, exit bool) {
 		trace.Return.Code = getReturnCode(regs)
 		t.decodeReturnCode(&trace)
 		// Populate args values
-		t.decodeArgs(&trace, regs)
+		t.decodeArgs(&trace, regs, argOffset)
 	}
 
 	var l []TracerCb
@@ -181,29 +181,27 @@ func (t *tracerImpl) decodeReturnCode(trace *Trace) {
 	}
 }
 
-func (t *tracerImpl) decodeArgs(trace *Trace, regs syscall.PtraceRegs) {
+func (t *tracerImpl) decodeArgs(trace *Trace, regs syscall.PtraceRegs, argsOffset int) {
 	if trace.Signature.Args == nil {
 		trace.Args = []ArgValue{
 			ArgValue{Str: "*ARGSNOTDEFINED*"},
 		}
 		return
 	}
-	if len(trace.Signature.Args) == 0 {
+	if len(trace.Signature.Args) <= argsOffset {
 		return
 	}
 
-	trace.Args = make([]ArgValue, len(trace.Signature.Args))
+	trace.Args = make([]ArgValue, len(trace.Signature.Args)-argsOffset)
 
 	defaultDecode := t.customDecodeArgs(trace, regs)
 
 	if defaultDecode {
-		for i, arg := range trace.Signature.Args {
+		for i, arg := range trace.Signature.Args[argsOffset:] {
 			t.decodeArg(arg.Type, getParam(regs, i), &trace.Args[i])
 		}
 	}
 }
-
-var ptrSize = reflect.TypeOf(uintptr(0)).Size()
 
 func (t *tracerImpl) decodeArg(typ interface{}, value regParam, argValue *ArgValue) {
 	switch typ.(type) {
@@ -218,7 +216,7 @@ func (t *tracerImpl) decodeArg(typ interface{}, value regParam, argValue *ArgVal
 		argValue.Value = value
 		argValue.Str = fmt.Sprintf("%d", argValue.Value)
 	case *uint64:
-		var out []byte = make([]byte, ptrSize)
+		var out []byte = make([]byte, 8)
 		count, err := syscall.PtracePeekData(t.cmd.Process.Pid, uintptr(value), out)
 		if err != nil {
 			log.Printf("Error while reading syscall arg: %s", err)

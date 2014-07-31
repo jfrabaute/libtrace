@@ -34,8 +34,12 @@ func getReturnCode(regs syscall.PtraceRegs) ReturnCode {
 	return ReturnCode(regs.Eax)
 }
 
-func getSyscallId(regs syscall.PtraceRegs) SyscallId {
-	return SyscallId(regs.Orig_eax)
+func getSyscallId(regs syscall.PtraceRegs) (SyscallId, int) {
+	if regs.Orig_eax == 102 /*socketcall*/ {
+		return SyscallId(regs.Ebx + 400), 1
+	} else {
+		return SyscallId(regs.Orig_eax), 0
+	}
 }
 
 func (t *tracerImpl) callback(regs syscall.PtraceRegs, exit bool) {
