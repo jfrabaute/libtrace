@@ -139,7 +139,7 @@ var syscalls = []*Signature{
 	&Signature{Id: 114, Name: "wait4", Args: []Arg{Arg{Name: "upid", Type: type_int32, Const: false}, Arg{Name: "stat_addr", Type: &type_uint32, Const: false}, Arg{Name: "options", Type: type_int, Const: false}, Arg{Name: "ru", Type: &type_unknownstruct, Const: false}}},
 	&Signature{Id: 115, Name: "swapoff", Args: []Arg{Arg{Name: "specialfile", Type: type_stringc, Const: true}}},
 	&Signature{Id: 116, Name: "sysinfo", Args: []Arg{Arg{Name: "info", Type: &type_unknownstruct, Const: false}}},
-	&Signature{Id: 117, Name: "ipc uint call", Args: []Arg{Arg{Name: "first", Type: type_int, Const: false}, Arg{Name: "second", Type: type_int, Const: false}, Arg{Name: "third", Type: type_int, Const: false}, Arg{Name: "ptr", Type: &type_uint8, Const: false}}},
+	&Signature{Id: 117, Name: "ipc", Args: []Arg{Arg{Name: "call", Type: type_uint, Const: false}, Arg{Name: "first", Type: type_int, Const: false}, Arg{Name: "second", Type: type_int, Const: false}, Arg{Name: "third", Type: type_int, Const: false}, Arg{Name: "ptr", Type: &type_uint8, Const: false}}},
 	&Signature{Id: 118, Name: "fsync", Args: []Arg{Arg{Name: "fd", Type: type_uint, Const: false}}},
 	&Signature{Id: 119, Name: "sigreturn", Args: []Arg{Arg{Name: "unused", Type: type_uint32, Const: false}}},
 	&Signature{Id: 120, Name: "clone", Args: []Arg{Arg{Name: "clone_flags", Type: type_unknownstruct, Const: false}}},

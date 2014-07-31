@@ -37,6 +37,8 @@ func getReturnCode(regs syscall.PtraceRegs) ReturnCode {
 func getSyscallId(regs syscall.PtraceRegs) (SyscallId, int) {
 	if regs.Orig_eax == 102 /*socketcall*/ {
 		return SyscallId(regs.Ebx + 400), 1
+	} else if regs.Orig_eax == 117 /* ipc */ {
+		return SyscallId(regs.Ebx + 420), 1
 	} else {
 		return SyscallId(regs.Orig_eax), 0
 	}
