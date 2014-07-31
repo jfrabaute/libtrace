@@ -1,6 +1,7 @@
 package libtrace
 
 import (
+	"fmt"
 	"log"
 	"syscall"
 )
@@ -66,6 +67,7 @@ func (t *tracerImpl) customDecodeArgs(trace *Trace, regs syscall.PtraceRegs) boo
 			trace.Args[0].Str = "*Unknown*"
 			trace.Args[1].Value = getParam(regs, 1)
 		}
+		trace.Args[1].Str = fmt.Sprintf("%d", trace.Args[1].Value)
 		return false
 	default:
 		return true

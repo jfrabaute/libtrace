@@ -203,6 +203,8 @@ func (t *tracerImpl) decodeArgs(trace *Trace, regs syscall.PtraceRegs) {
 	}
 }
 
+var ptrSize = reflect.TypeOf(uintptr(0)).Size()
+
 func (t *tracerImpl) decodeArg(typ interface{}, value regParam, argValue *ArgValue) {
 	switch typ.(type) {
 	case StringC:
@@ -216,7 +218,7 @@ func (t *tracerImpl) decodeArg(typ interface{}, value regParam, argValue *ArgVal
 		argValue.Value = value
 		argValue.Str = fmt.Sprintf("%d", argValue.Value)
 	case *uint64:
-		var out []byte = make([]byte, 8)
+		var out []byte = make([]byte, ptrSize)
 		count, err := syscall.PtracePeekData(t.cmd.Process.Pid, uintptr(value), out)
 		if err != nil {
 			log.Printf("Error while reading syscall arg: %s", err)
