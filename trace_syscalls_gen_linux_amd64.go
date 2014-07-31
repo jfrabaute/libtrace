@@ -1,28 +1,27 @@
 package libtrace
 
 var (
-	type_int          = int(0)
-	type_int8         = int8(0)
-	type_int16        = int16(0)
-	type_int32        = int32(0)
-	type_int64        = int64(0)
-	type_uint8        = uint8(0)
-	type_uint16       = uint16(0)
-	type_uint32       = uint32(0)
-	type_uint64       = uint64(0)
-	type_uintptr      = uintptr(0)
-	type_float32      = float32(0)
-	type_float64      = float64(0)
-	type_stringc      = StringC("")
-	type_stringbuffer = StringBuffer("")
-	type_buffer       = []byte{}
+	type_int     = int(0)
+	type_int8    = int8(0)
+	type_int16   = int16(0)
+	type_int32   = int32(0)
+	type_int64   = int64(0)
+	type_uint8   = uint8(0)
+	type_uint16  = uint16(0)
+	type_uint32  = uint32(0)
+	type_uint64  = uint64(0)
+	type_uintptr = uintptr(0)
+	type_float32 = float32(0)
+	type_float64 = float64(0)
+	type_stringc = StringC("")
+	type_buffer  = []byte{}
 
 	type_unknownstruct = struct{}{}
 )
 
 var syscalls = []*Signature{
 
-	&Signature{Id: 0, Name: "read", Args: []Arg{Arg{Name: "fd", Type: type_uint32, Const: false}, Arg{Name: "buf", Type: type_stringc, Const: false}, Arg{Name: "count", Type: type_uint64, Const: false}}},
+	&Signature{Id: 0, Name: "read", Args: []Arg{Arg{Name: "fd", Type: type_uint32, Const: false}, Arg{Name: "buf", Type: StringBuffer(-1), Const: false}, Arg{Name: "count", Type: type_uint64, Const: false}}},
 	&Signature{Id: 1, Name: "write", Args: []Arg{Arg{Name: "fd", Type: type_uint32, Const: false}, Arg{Name: "buf", Type: type_stringc, Const: true}, Arg{Name: "count", Type: type_uint64, Const: false}}},
 	&Signature{Id: 2, Name: "open", Args: []Arg{Arg{Name: "filename", Type: type_stringc, Const: true}, Arg{Name: "flags", Type: type_int, Const: false}, Arg{Name: "mode", Type: type_int, Const: false}}},
 	&Signature{Id: 3, Name: "close", Args: []Arg{Arg{Name: "fd", Type: type_uint32, Const: false}}},

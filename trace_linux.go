@@ -197,8 +197,28 @@ func (t *tracerImpl) decodeArgs(trace *Trace, regs syscall.PtraceRegs, argsOffse
 	defaultDecode := t.customDecodeArgs(trace, regs)
 
 	if defaultDecode {
+		var stringBuffers []int = make([]int, 0, len(trace.Args))
 		for i, arg := range trace.Signature.Args[argsOffset:] {
-			t.decodeArg(arg.Type, getParam(regs, i), &trace.Args[i])
+			switch arg.Type.(type) {
+			case StringBuffer:
+				stringBuffers = append(stringBuffers, i)
+			default:
+				t.decodeArg(arg.Type, getParam(regs, i), &trace.Args[i])
+			}
+		}
+		for _, i := range stringBuffers {
+			size := 0
+			v := trace.Signature.Args[argsOffset+i].Type.(StringBuffer)
+			switch v {
+			case -1:
+				size = int(trace.Return.Code)
+			case 0, 1, 2, 3, 4, 5, 6:
+				size = int(getParam(regs, int(v)))
+			default:
+				log.Printf("StringBuffer CountPos is invalid: %d\n", v)
+			}
+			trace.Args[i].Str = t.decodeArgStringBuffer(getParam(regs, i), size)
+			trace.Args[i].Value = trace.Args[i].Str
 		}
 	}
 }
@@ -266,6 +286,49 @@ func (t *tracerImpl) decodeArgStringC(value regParam) string {
 		}
 
 		i++
+	}
+
+	result := "\"" + string(str) + "\""
+	if extra {
+		result += "..."
+	}
+
+	return result
+}
+
+func (t *tracerImpl) decodeArgStringBuffer(value regParam, size int) string {
+	if size <= 0 {
+		return ""
+	}
+
+	out := []byte{0}
+	bufferSize := size
+	extra := false
+	if bufferSize > 32 {
+		extra = true
+		bufferSize = 32
+	}
+	str := make([]byte, 0, bufferSize)
+	for i := 0; i < bufferSize; i++ {
+		count, err := syscall.PtracePeekData(t.cmd.Process.Pid, uintptr(value+regParam(i)), out)
+		if err != nil {
+			log.Printf("Error while reading syscall arg: %s", err)
+		}
+		if count != 1 {
+			log.Printf("Error while reading syscall arg: count = %d (should be 1)", count)
+		}
+		switch {
+		case out[0] == '\n':
+			str = append(str, '\\', 'n')
+		case out[0] == '\r':
+			str = append(str, '\\', 'r')
+		case out[0] == '\t':
+			str = append(str, '\\', 't')
+		case out[0] >= ' ' && out[0] <= '~':
+			str = append(str, out[0])
+		default:
+			str = append(str, []byte(fmt.Sprintf("\\%d", out[0]))...)
+		}
 	}
 
 	result := "\"" + string(str) + "\""

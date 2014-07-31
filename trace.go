@@ -80,6 +80,14 @@ type Signature struct {
 }
 
 // Custom types
-type StringC string      // String arg passed as C String (null terminated)
-type StringBuffer string // String arg passed with a "count" value
+
+// String arg passed as C String (null terminated)
+type StringC string
+
+// String arg passed with a buf "size" value
+// the value itself is where to find the buf size
+// -1: return value of the syscall (when positive)
+// 0-6: arg pos
+type StringBuffer int
+
 type Buffer []byte
