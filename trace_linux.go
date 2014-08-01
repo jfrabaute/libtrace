@@ -224,6 +224,13 @@ func (t *tracerImpl) decodeArgs(trace *Trace, regs syscall.PtraceRegs, argsOffse
 }
 
 func (t *tracerImpl) decodeArg(typ interface{}, value regParam, argValue *ArgValue) {
+
+	if reflect.TypeOf(typ).Kind() == reflect.Ptr && value == 0 {
+		argValue.Str = "NULL"
+		argValue.Value = nil
+		return
+	}
+
 	switch typ.(type) {
 	case StringC:
 		argValue.Str = t.decodeArgStringC(value)
