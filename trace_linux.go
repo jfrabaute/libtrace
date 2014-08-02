@@ -200,7 +200,7 @@ func (t *tracerImpl) decodeArgs(trace *Trace, regs syscall.PtraceRegs, argsOffse
 		var stringBuffers []int = make([]int, 0, len(trace.Args))
 		for i, arg := range trace.Signature.Args[argsOffset:] {
 			switch arg.Type.(type) {
-			case StringBuffer:
+			case Buffer:
 				stringBuffers = append(stringBuffers, i)
 			default:
 				t.decodeArg(arg.Type, getParam(regs, i), &trace.Args[i])
@@ -208,7 +208,7 @@ func (t *tracerImpl) decodeArgs(trace *Trace, regs syscall.PtraceRegs, argsOffse
 		}
 		for _, i := range stringBuffers {
 			size := 0
-			v := trace.Signature.Args[argsOffset+i].Type.(StringBuffer)
+			v := trace.Signature.Args[argsOffset+i].Type.(Buffer)
 			switch v {
 			case -1:
 				size = int(trace.Return.Code)

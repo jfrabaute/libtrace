@@ -21,7 +21,7 @@ var (
 
 var syscalls = []*Signature{
 
-	&Signature{Id: 0, Name: "read", Args: []Arg{Arg{Name: "fd", Type: type_uint32, Const: false}, Arg{Name: "buf", Type: StringBuffer(-1), Const: false}, Arg{Name: "count", Type: type_uint64, Const: false}}},
+	&Signature{Id: 0, Name: "read", Args: []Arg{Arg{Name: "fd", Type: type_uint32, Const: false}, Arg{Name: "buf", Type: Buffer(-1), Const: false}, Arg{Name: "count", Type: type_uint64, Const: false}}},
 	&Signature{Id: 1, Name: "write", Args: []Arg{Arg{Name: "fd", Type: type_uint32, Const: false}, Arg{Name: "buf", Type: type_stringc, Const: true}, Arg{Name: "count", Type: type_uint64, Const: false}}},
 	&Signature{Id: 2, Name: "open", Args: []Arg{Arg{Name: "filename", Type: type_stringc, Const: true}, Arg{Name: "flags", Type: type_int, Const: false}, Arg{Name: "mode", Type: type_int, Const: false}}},
 	&Signature{Id: 3, Name: "close", Args: []Arg{Arg{Name: "fd", Type: type_uint32, Const: false}}},

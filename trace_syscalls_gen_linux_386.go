@@ -24,7 +24,7 @@ var syscalls = []*Signature{
 	&Signature{Id: 0, Name: "restart_syscall", Args: nil},
 	&Signature{Id: 1, Name: "exit", Args: []Arg{Arg{Name: "error_code", Type: type_int, Const: false}}},
 	&Signature{Id: 2, Name: "fork", Args: []Arg{Arg{Name: "regs", Type: &type_unknownstruct, Const: false}}},
-	&Signature{Id: 3, Name: "read", Args: []Arg{Arg{Name: "fd", Type: type_uint, Const: false}, Arg{Name: "buf", Type: StringBuffer(-1), Const: false}, Arg{Name: "count", Type: type_uint64, Const: false}}},
+	&Signature{Id: 3, Name: "read", Args: []Arg{Arg{Name: "fd", Type: type_uint, Const: false}, Arg{Name: "buf", Type: Buffer(-1), Const: false}, Arg{Name: "count", Type: type_uint64, Const: false}}},
 	&Signature{Id: 4, Name: "write", Args: []Arg{Arg{Name: "fd", Type: type_uint, Const: false}, Arg{Name: "buf", Type: type_stringc, Const: true}, Arg{Name: "count", Type: type_uint64, Const: false}}},
 	&Signature{Id: 5, Name: "open", Args: []Arg{Arg{Name: "filename", Type: type_stringc, Const: true}, Arg{Name: "flags", Type: type_int, Const: false}, Arg{Name: "mode", Type: type_int, Const: false}}},
 	&Signature{Id: 6, Name: "close", Args: []Arg{Arg{Name: "fd", Type: type_uint, Const: false}}},
