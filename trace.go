@@ -40,6 +40,14 @@ type Tracer interface {
 	// Shortcut for RegisterGlobalChannelOnEnter + RegisterGlobalChannelOnExit
 	RegisterGlobalChannel(out chan<- *Trace)
 
+	// Set max string size representation to decode
+	// Default to 32
+	SetMaxStringSize(strSize uint64)
+
+	// Set max buffer size to decode
+	// Default to 32
+	SetMaxBufferSize(bufferSize uint64)
+
 	Run() error
 }
 

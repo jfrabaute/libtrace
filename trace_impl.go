@@ -13,6 +13,9 @@ func NewTracer(cmd *exec.Cmd) Tracer {
 		globalChannelsOnExit:   make([]chan<- *Trace, 0, 1),
 		channelsOnEnter:        make(map[string][]chan<- *Trace),
 		channelsOnExit:         make(map[string][]chan<- *Trace),
+
+		maxStringSize: 32,
+		maxBufferSize: 32,
 	}
 }
 
@@ -28,6 +31,9 @@ type tracerImpl struct {
 	globalChannelsOnExit  []chan<- *Trace
 	channelsOnEnter       map[string][]chan<- *Trace
 	channelsOnExit        map[string][]chan<- *Trace
+
+	maxStringSize uint64
+	maxBufferSize uint64
 }
 
 func (t *tracerImpl) RegisterCb(cb TracerCb, fnNames ...string) {
@@ -108,4 +114,12 @@ func (t *tracerImpl) RegisterGlobalChannelOnEnter(out chan<- *Trace) {
 
 func (t *tracerImpl) RegisterGlobalChannelOnExit(out chan<- *Trace) {
 	t.globalChannelsOnExit = append(t.globalChannelsOnExit, out)
+}
+
+func (t *tracerImpl) SetMaxStringSize(strSize uint64) {
+	t.maxStringSize = strSize
+}
+
+func (t *tracerImpl) SetMaxBufferSize(bufferSize uint64) {
+	t.maxBufferSize = bufferSize
 }

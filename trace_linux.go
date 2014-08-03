@@ -207,18 +207,17 @@ func (t *tracerImpl) decodeArgs(trace *Trace, regs syscall.PtraceRegs, argsOffse
 			}
 		}
 		for _, i := range stringBuffers {
-			size := 0
+			size := uint64(0)
 			v := trace.Signature.Args[argsOffset+i].Type.(Buffer)
 			switch v {
 			case -1:
-				size = int(trace.Return.Code)
+				size = uint64(trace.Return.Code)
 			case 0, 1, 2, 3, 4, 5, 6:
-				size = int(getParam(regs, int(v)))
+				size = uint64(getParam(regs, int(v)))
 			default:
 				log.Printf("StringBuffer CountPos is invalid: %d\n", v)
 			}
-			trace.Args[i].Str = t.decodeArgStringBuffer(getParam(regs, i), size)
-			trace.Args[i].Value = trace.Args[i].Str
+			trace.Args[i].Value, trace.Args[i].Str = t.decodeArgBuffer(getParam(regs, i), size)
 		}
 	}
 }
@@ -262,14 +261,14 @@ func (t *tracerImpl) decodeArg(typ interface{}, value regParam, argValue *ArgVal
 func (t *tracerImpl) decodeArgStringC(value regParam) string {
 	out := []byte{0}
 	str := make([]byte, 0, 10)
-	i := 0
+	i := uint64(0)
 	extra := false
 	for {
 		count, err := syscall.PtracePeekData(t.cmd.Process.Pid, uintptr(value+regParam(i)), out)
 		if out[0] == 0 {
 			break
 		}
-		if i > 32 /*strsize to display*/ {
+		if i > t.maxStringSize {
 			extra = true
 			break
 		}
@@ -303,47 +302,54 @@ func (t *tracerImpl) decodeArgStringC(value regParam) string {
 	return result
 }
 
-func (t *tracerImpl) decodeArgStringBuffer(value regParam, size int) string {
-	if size <= 0 {
-		return ""
+func (t *tracerImpl) decodeArgBuffer(value regParam, size uint64) (buffer []byte, str string) {
+	if size < 0 {
+		return nil, ""
+	}
+	if size == 0 {
+		return []byte{}, ""
 	}
 
-	out := []byte{0}
 	bufferSize := size
 	extra := false
-	if bufferSize > 32 {
+	if bufferSize > t.maxBufferSize {
 		extra = true
-		bufferSize = 32
+		bufferSize = t.maxBufferSize
 	}
-	str := make([]byte, 0, bufferSize)
-	for i := 0; i < bufferSize; i++ {
-		count, err := syscall.PtracePeekData(t.cmd.Process.Pid, uintptr(value+regParam(i)), out)
-		if err != nil {
-			log.Printf("Error while reading syscall arg: %s", err)
-		}
-		if count != 1 {
-			log.Printf("Error while reading syscall arg: count = %d (should be 1)", count)
-		}
+	buffer = make([]byte, bufferSize)
+	count, err := syscall.PtracePeekData(t.cmd.Process.Pid, uintptr(value), buffer)
+	if err != nil {
+		str = fmt.Sprintf("Error while reading syscall arg: %s", err)
+		return
+	}
+	if uint64(count) != bufferSize {
+		str = fmt.Sprintf("Error while reading syscall arg: count = %d (should be %d)", count, bufferSize)
+		return
+	}
+	strBuffer := make([]byte, 0, bufferSize+2)
+	strBuffer = append(strBuffer, '"')
+	for _, b := range buffer {
 		switch {
-		case out[0] == '\n':
-			str = append(str, '\\', 'n')
-		case out[0] == '\r':
-			str = append(str, '\\', 'r')
-		case out[0] == '\t':
-			str = append(str, '\\', 't')
-		case out[0] >= ' ' && out[0] <= '~':
-			str = append(str, out[0])
+		case b == '\n':
+			strBuffer = append(strBuffer, '\\', 'n')
+		case b == '\r':
+			strBuffer = append(strBuffer, '\\', 'r')
+		case b == '\t':
+			strBuffer = append(strBuffer, '\\', 't')
+		case b >= ' ' && b <= '~':
+			strBuffer = append(strBuffer, b)
 		default:
-			str = append(str, []byte(fmt.Sprintf("\\%d", out[0]))...)
+			strBuffer = append(strBuffer, []byte(fmt.Sprintf("\\%d", b))...)
 		}
 	}
 
-	result := "\"" + string(str) + "\""
+	strBuffer = append(strBuffer, '"')
 	if extra {
-		result += "..."
+		strBuffer = append(strBuffer, "..."...)
 	}
+	str = string(strBuffer)
 
-	return result
+	return
 }
 
 func decodeReturnCodeLinux(trace *Trace) {
