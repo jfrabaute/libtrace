@@ -34,9 +34,9 @@ tracer.Run()
 ### Monitoring only "open" syscall
 ```go
 tracer := libtrace.NewTracer(cmd)
-tracer.RegisterCbOnExit(func(trace *libtrace.Trace, "open") {
+tracer.RegisterCbOnExit(func(trace *libtrace.Trace) {
 	log.Printf("open: %d %s\n", trace.Return.Code, trace.Return.Description)
-})
+}, "open")
 
 tracer.Run()
 ```
